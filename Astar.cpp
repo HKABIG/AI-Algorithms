@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define DIMENSION 3 // Size of board 3X3 formalized to avoid magic numbers
+
 class Node {
 public:
     vector<vector<int>> state;
@@ -20,6 +22,18 @@ public:
     }
 };
 
+void printBoard(vector<vector<int>> board, int size)
+{
+    for(int i = 0; i<size;++i)
+    {
+        for(int j = 0; j<size;++j)
+        {
+            cout<<board[i][j]<<' ';
+        }
+        cout<<'\n';
+    }
+}
+
 vector<vector<int>> target = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
 int dx[] = {0, -1, 0, 1};
 int dy[] = {1, 0, -1, 0};
@@ -28,8 +42,8 @@ Node* CLOSED = NULL;
 
 int calculateHeuristic(vector<vector<int>> puzzle) {
     int h = 0;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < DIMENSION; i++) {
+        for (int j = 0; j < DIMENSION; j++) {
             h += abs(target[i][j] - puzzle[i][j]);
         }
     }
@@ -65,8 +79,8 @@ void pushClosed(Node* head){
 }
 
 void getNeighbors(Node* node) {
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < DIMENSION; i++) {
+        for (int j = 0; j < DIMENSION; j++) {
             if (node->state[i][j] == 0) {
                 for (int k = 0; k < 4; k++) {
                     if (0 <= i + dx[k] && i + dx[k] < 3 && 0 <= j + dy[k] && j + dy[k] < 3) {
@@ -114,20 +128,15 @@ Node* aStar(Node* start) {
 }
 
 int main() {
-    vector<vector<int>> initialPuzzle(3, vector<int>(3, 0));
+    vector<vector<int>> initialPuzzle(DIMENSION, vector<int>(DIMENSION, 0));
     cout << "Enter initial 8-puzzle position:" << endl;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < DIMENSION; i++) {
+        for (int j = 0; j < DIMENSION; j++) {
             cin >> initialPuzzle[i][j];
         }
     }
     cout << "Initial state of puzzle is:" << endl;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            cout << initialPuzzle[i][j] << " ";
-        }
-        cout << endl;
-    }
+    printBoard(initialPuzzle,DIMENSION);
     Node* startNode = new Node(initialPuzzle, 0, calculateHeuristic(initialPuzzle), NULL);
     Node* goalNode = aStar(startNode);
     cout << "The Goal state has been reached with cost of " << goalNode->cost << endl;
@@ -147,4 +156,12 @@ int main() {
         iter = iter->next;
     }
     cout << "NULL" << endl;
+    cout << "Thus solution is - "<<'\n';
+    iter = goalNode;
+    while(iter!=NULL){
+        printBoard(iter->state,DIMENSION);
+        cout<<"\n";
+        iter = iter->parent;
+    }
+    cout<<"Initial State\n";
 }
